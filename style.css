@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -28,24 +28,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Smooth scroll container */
-#scroll-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  will-change: transform;
-}
-
-#scroll-proxy {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-  scroll-behavior: smooth;
-}
 
 /* ─── NAV ─── */
 nav {
@@ -148,7 +130,7 @@ nav {
 .hero-quote {
   font-size: clamp(1.1rem, 2.4vw, 1.65rem);
   font-weight: 400;
-  font-style: italic;
+
   line-height: 1.65;
   letter-spacing: 0.01em;
   margin-bottom: 24px;

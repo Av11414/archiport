@@ -99,10 +99,17 @@
     <button class="overlay-close" id="slideshow-close" aria-label="Close slideshow">✕</button>
     <button class="slideshow-arrow slideshow-arrow-prev" id="slideshow-prev" aria-label="Previous slide">←</button>
     <img class="slideshow-img" id="slideshow-img" src="" alt="" draggable="false" />
+    <canvas id="model-canvas" class="model-canvas"></canvas>
+    <div class="model-loading" id="model-loading">Loading model...</div>
+    <div class="model-label" id="model-label">3D Model</div>
+    <div class="model-instructions" id="model-instructions">Drag to rotate · Scroll to zoom · Right-click to pan</div>
     <button class="slideshow-arrow slideshow-arrow-next" id="slideshow-next" aria-label="Next slide">→</button>
     <p class="slideshow-counter" id="slideshow-counter">1 / 4</p>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

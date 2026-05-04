@@ -704,6 +704,57 @@ footer {
   z-index: 2;
 }
 
+/* ─── 3D MODEL VIEWER ─── */
+.model-canvas {
+  position: absolute;
+  inset: 0;
+  display: none;
+  z-index: 1;
+}
+
+.model-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: rgba(255, 255, 255, 0.4);
+  display: none;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.model-label {
+  position: absolute;
+  top: 28px;
+  left: 36px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  display: none;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.model-instructions {
+  position: absolute;
+  bottom: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.3);
+  display: none;
+  z-index: 3;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 /* ─── RESPONSIVE ─── */
 @media (max-width: 900px) {
   nav {

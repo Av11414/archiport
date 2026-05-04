@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://arav-jivani.com/sitemap.xml

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume — Arav Hussain Jivani</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── Resume page overrides (light document) ── */
+    body {
+      background: #fff;
+      color: #111;
+      user-select: text;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+    }
+
+    /* Nav override for white background */
+    nav .nav-wordmark,
+    nav .nav-links a { color: #111 !important; }
+    nav .nav-icon svg { fill: #111 !important; }
+
+    /* ── Resume layout ── */
+    .resume-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 140px 56px 80px;
+    }
+
+    /* ── NAME ── */
+    .resume-name {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-align: center;
+      color: #111;
+      margin-bottom: 28px;
+    }
+
+    /* ── CONTACT ROW ── */
+    .resume-contact {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px 32px;
+      margin-bottom: 32px;
+    }
+
+    .resume-contact-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: #333;
+    }
+
+    .resume-contact-item svg {
+      width: 14px;
+      height: 14px;
+      fill: #555;
+      flex-shrink: 0;
+    }
+
+    .resume-contact-item a {
+      color: #333;
+      text-decoration: none;
+    }
+
+    .resume-contact-item a:hover { text-decoration: underline; }
+
+    /* ── FULL-WIDTH DIVIDER ── */
+    .resume-rule {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 0 0 36px;
+    }
+
+    /* ── TWO COLUMNS ── */
+    .resume-columns {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 0;
+    }
+
+    .resume-left {
+      padding-right: 40px;
+      border-right: 1px solid #ccc;
+    }
+
+    .resume-right {
+      padding-left: 40px;
+    }
+
+    /* ── SECTION HEADERS ── */
+    .resume-section-title {
+      font-size: 0.82rem;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #111;
+      margin-bottom: 18px;
+    }
+
+    .resume-section-divider {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 28px 0;
+    }
+
+    /* ── EDUCATION ── */
+    .edu-degree {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .edu-school {
+      font-size: 0.78rem;
+      color: #333;
+      margin-bottom: 4px;
+      line-height: 1.5;
+    }
+
+    .edu-detail {
+      font-size: 0.74rem;
+      color: #555;
+      line-height: 1.7;
+    }
+
+    /* ── SKILLS ── */
+    .skills-group-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    .skills-list {
+      list-style: disc;
+      padding-left: 18px;
+      margin: 0 0 0;
+    }
+
+    .skills-list li {
+      font-size: 0.74rem;
+      color: #333;
+      line-height: 1.8;
+      letter-spacing: 0.02em;
+    }
+
+    .skills-inline {
+      font-size: 0.74rem;
+      color: #333;
+      line-height: 1.8;
+      letter-spacing: 0.02em;
+      margin-bottom: 20px;
+    }
+
+    /* ── EXPERIENCE ── */
+    .exp-entry {
+      display: grid;
+      grid-template-columns: 84px 1fr;
+      gap: 0 20px;
+      margin-bottom: 28px;
+    }
+
+    .exp-year {
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      color: #666;
+      padding-top: 2px;
+      line-height: 1.4;
+    }
+
+    .exp-body {}
+
+    .exp-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #111;
+      margin-bottom: 3px;
+    }
+
+    .exp-subtitle {
+      font-size: 0.7rem;
+      color: #777;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .exp-description {
+      font-size: 0.74rem;
+      line-height: 1.75;
+      color: #333;
+      letter-spacing: 0.02em;
+    }
+
+    /* ── DOWNLOAD BUTTON ── */
+    .download-cv {
+      position: fixed;
+      bottom: 36px;
+      right: 36px;
+      background: #0d0d0d;
+      color: #fff;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border: none;
+      padding: 14px 28px;
+      cursor: pointer;
+      z-index: 200;
+      transition: opacity 0.3s ease;
+    }
+
+    .download-cv:hover { opacity: 0.75; }
+
+    /* ── PRINT ── */
+    @media print {
+      nav            { display: none !important; }
+      .download-cv   { display: none !important; }
+      body           { background: #fff; }
+      .resume-wrapper { padding-top: 32px; }
+      @page          { margin: 1.8cm 1.6cm; size: A4 portrait; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .resume-wrapper { padding: 110px 24px 60px; }
+
+      .resume-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .resume-left {
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+        padding-right: 0;
+        padding-bottom: 28px;
+        margin-bottom: 28px;
+      }
+
+      .resume-right { padding-left: 0; }
+
+      .download-cv { bottom: 20px; right: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-wordmark">Arav</a>
+    <ul class="nav-links">
+      <li><a href="portfolio.html">Portfolio</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="resume.html">Resume</a></li>
+      <li>
+        <a href="https://www.instagram.com/v_zviz/" target="_blank" rel="noopener" class="nav-icon" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+      </li>
+      <li>
+        <a href="https://www.linkedin.com/in/arav-jivani/" target="_blank" rel="noopener" class="nav-icon" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="resume-wrapper">
+
+    <!-- ── NAME ── -->
+    <h1 class="resume-name">Arav Hussain Jivani</h1>
+
+    <!-- ── CONTACT ── -->
+    <div class="resume-contact">
+      <span class="resume-contact-item">
+        <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.47 11.47 0 003.58.57 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.47 11.47 0 00.57 3.58 1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
+        678-603-8812
+      </span>
+      <span class="resume-contact-item">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        <a href="mailto:aravjivani@gmail.com">aravjivani@gmail.com</a>
+      </span>
+      <span class="resume-contact-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"/></svg>
+        Savannah, GA
+      </span>
+      <span class="resume-contact-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm-1 17.93V18a1 1 0 00-1-1H8v-2a1 1 0 00-1-1H4.07A8.02 8.02 0 014 12c0-.34.02-.67.07-1H6a1 1 0 001-1V8a1 1 0 011-1h2V5.07A8.01 8.01 0 0119.93 11H18a1 1 0 00-1 1v2h-2a1 1 0 00-1 1v3.93z"/></svg>
+        <a href="http://arav-jivani.com" target="_blank" rel="noopener">arav-jivani.com</a>
+      </span>
+    </div>
+
+    <hr class="resume-rule" />
+
+    <!-- ── TWO COLUMNS ── -->
+    <div class="resume-columns">
+
+      <!-- ════ LEFT COLUMN ════ -->
+      <div class="resume-left">
+
+        <!-- EDUCATION -->
+        <h2 class="resume-section-title">Education</h2>
+
+        <p class="edu-degree">Bachelor of Fine Arts in Architecture</p>
+        <p class="edu-school">Savannah College of Art and Design (SCAD)</p>
+        <p class="edu-detail">GPA: 3.55</p>
+        <p class="edu-detail">Expected Graduation: Spring 2028</p>
+
+        <hr class="resume-section-divider" />
+
+        <!-- SKILLS -->
+        <h2 class="resume-section-title">Skills</h2>
+
+        <p class="skills-group-title">Software:</p>
+        <ul class="skills-list">
+          <li>Revit</li>
+          <li>Rhino</li>
+          <li>Adobe InDesign</li>
+          <li>Adobe Photoshop</li>
+          <li>Lumion</li>
+          <li>Blender</li>
+          <li>Veras AI</li>
+        </ul>
+
+        <hr class="resume-section-divider" />
+
+        <p class="skills-group-title">Architectural &amp; Design Skills</p>
+        <ul class="skills-list">
+          <li>Architectural drawings (plans, sections, elevations)</li>
+          <li>Concept development and spatial sequencing</li>
+          <li>Massing and volumetric studies</li>
+          <li>Solar and environmental analysis (concept level)</li>
+          <li>Digital modeling and architectural visualization</li>
+          <li>Presentation board layout and visual communication</li>
+        </ul>
+
+      </div>
+      <!-- end left column -->
+
+      <!-- ════ RIGHT COLUMN ════ -->
+      <div class="resume-right">
+
+        <!-- EXPERIENCE -->
+        <h2 class="resume-section-title">Experience</h2>
+
+        <!-- EXPERIENCE ENTRY: Concept Kiosk -->
+        <div class="exp-entry">
+          <span class="exp-year">2025</span>
+          <div class="exp-body">
+            <p class="exp-title">Concept Kiosk</p>
+            <p class="exp-subtitle">Studio Project</p>
+            <p class="exp-description">Designed a small-scale kiosk focused on cultural representation and public engagement. Developed massing studies and architectural drawings using Revit. Produced final presentation boards using Adobe InDesign and Photoshop. Generated architectural visualizations using Lumion.</p>
+          </div>
+        </div>
+
+        <!-- EXPERIENCE ENTRY: House of Meditation -->
+        <div class="exp-entry">
+          <span class="exp-year">2025–2026</span>
+          <div class="exp-body">
+            <p class="exp-title">House of Meditation</p>
+            <p class="exp-subtitle">Personal Project — Winter Break</p>
+            <p class="exp-description">Designed a conceptual retreat centered on solar orientation, light control, and spatial experience. Explored form and environmental response through iterative massing and section studies. Completed using Revit, Photoshop, Blender.</p>
+          </div>
+        </div>
+
+        <!-- EXPERIENCE ENTRY: Experimental Getaway Monolith House -->
+        <div class="exp-entry">
+          <span class="exp-year">2026</span>
+          <div class="exp-body">
+            <p class="exp-title">Experimental Getaway Monolith House</p>
+            <p class="exp-subtitle">Personal Project</p>
+            <p class="exp-description">Developed a residential concept emphasizing interior spatial experience and material atmosphere. Investigated non-traditional layouts and ritualized movement through space. Completed using Revit, Photoshop, Blender, Veras.</p>
+          </div>
+        </div>
+
+        <!-- EXPERIENCE ENTRY: Garden Intellectual Space -->
+        <div class="exp-entry">
+          <span class="exp-year">2026</span>
+          <div class="exp-body">
+            <p class="exp-title">Garden Intellectual Space</p>
+            <p class="exp-subtitle">Personal Project</p>
+            <p class="exp-description">Initiating a small-scale design-build project intended for physical construction. Responsible for concept development, spatial layout, and material logic. Project will translate digital design into on-site fabrication and assembly.</p>
+          </div>
+        </div>
+
+        <hr class="resume-section-divider" />
+
+      </div>
+      <!-- end right column -->
+
+    </div>
+    <!-- end two columns -->
+
+  </main>
+
+  <!-- DOWNLOAD CV BUTTON -->
+  <button class="download-cv" onclick="window.print()">Download CV ↓</button>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,4 +1,3 @@
-/* ─── HERO VIDEO PARALLAX ─── */
 (function () {
   window.addEventListener('DOMContentLoaded', () => {
     const video = document.querySelector('.hero-video');
@@ -18,7 +17,6 @@
   });
 })();
 
-/* ─── INTERSECTION OBSERVER REVEAL ─── */
 (function () {
   window.addEventListener('DOMContentLoaded', () => {
     const els = document.querySelectorAll('.reveal');
@@ -40,7 +38,6 @@
   });
 })();
 
-/* ─── IMAGE PROTECTION ─── */
 (function () {
   document.addEventListener('contextmenu', (e) => {
     if (e.target.tagName === 'IMG') e.preventDefault();
@@ -68,61 +65,60 @@
   }, { passive: false });
 })();
 
-/* ─── PORTFOLIO EXPAND + SLIDESHOW + 3D VIEWER ─── */
 (function () {
   const PROJECTS = {
     meditation: {
       title: 'The House of Meditation',
       location: 'Tokyo, Japan',
-      hero: 'images/meditation-hero.png',
+      hero: 'images/meditation-hero.webp',
       description: 'The House of Meditation is an experimental architecture project designed around a compact retreat defined by compression, vertical release, and controlled light. Movement slows the body before opening into a single meditation chamber. A circular roof aperture introduces a moving beam of sunlight, making time the primary spatial element.',
       slides: [
-        'images/meditation-hero.png',
-        'images/meditation-slide-02.jpg',
-        'images/meditation-slide-03.jpg',
-        'images/meditation-slide-04.jpg',
+        'images/meditation-hero.webp',
+        'images/meditation-slide-02.webp',
+        'images/meditation-slide-03.webp',
+        'images/meditation-slide-04.webp',
         { type: '3d', src: 'images/meditation-model.glb' },
-        'images/meditation-slide-05.jpg'
+        'images/meditation-slide-05.webp'
       ],
       url: 'meditation.html'
     },
     monolith: {
       title: 'Get-away Monolith',
       location: 'Remote hill top',
-      hero: 'images/monolith-hero.png',
+      hero: 'images/monolith-hero.webp',
       description: 'An experimental architecture/interior design project based on location and privacy. The house is set in a remote location to serve as a get-away for a weekend or vacation. Designed with a black obsidian color design, the house is a destimulator in a fast moving world, allowing the occupant to slow down in luxury while enjoying nature around them.',
       slides: [
-        'images/monolith-hero.png',
-        'images/monolith-slide-02.jpg',
-        'images/monolith-slide-03.jpg',
+        'images/monolith-hero.webp',
+        'images/monolith-slide-02.webp',
+        'images/monolith-slide-03.webp',
         { type: '3d', src: 'images/monolith-model.glb' },
-        'images/monolith-slide-04.jpg'
+        'images/monolith-slide-04.webp'
       ],
       url: 'monolith.html'
     },
     garden: {
       title: 'Garden Intellectual Space',
       location: 'Kampala, Uganda',
-      hero: 'images/garden-hero.png',
+      hero: 'images/garden-hero.webp',
       description: 'An architecture/interior design exploration project done to study materials and how it can affect interior environments. A personal test to discover if I can design for purpose. The purpose of this space is to support working conditions and productivity.',
       slides: [
-        'images/garden-hero.png',
-        'images/garden-slide-02.jpg',
-        'images/garden-slide-03.jpg',
+        'images/garden-hero.webp',
+        'images/garden-slide-02.webp',
+        'images/garden-slide-03.webp',
         { type: '3d', src: 'images/garden-model.glb' },
-        'images/garden-slide-04.jpg'
+        'images/garden-slide-04.webp'
       ],
       url: 'garden.html'
     }
   };
 
-  /* ── State ── */
+
   let currentProject = null;
   let countdownTimer = null;
   let slideIndex = 0;
   let slideList = [];
 
-  /* ── Three.js state ── */
+
   let threeRenderer = null;
   let threeScene = null;
   let threeCamera = null;
@@ -132,7 +128,7 @@
   let currentModelObject = null;
   let instrHideTimer = null;
 
-  /* ── DOM refs ── */
+
   const expandOverlay   = document.getElementById('expand-overlay');
   const expandBg        = document.getElementById('expand-bg');
   const expandClose     = document.getElementById('expand-close');
@@ -154,12 +150,11 @@
   const modelLoading = document.getElementById('model-loading');
   const modelLabel   = document.getElementById('model-label');
   const modelInstr   = document.getElementById('model-instructions');
+  const modelSpinner = document.getElementById('model-spinner');
 
   if (!expandOverlay) return;
 
-  /* ══════════════════════════════════════
-     THREE.JS VIEWER
-  ══════════════════════════════════════ */
+
 
   function initThree() {
     if (threeRenderer) return;
@@ -174,7 +169,7 @@
 
     threeCamera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.01, 2000);
 
-    /* 3-point lighting — architectural, clean */
+
     const ambient = new THREE.AmbientLight(0xffffff, 0.55);
     threeScene.add(ambient);
 
@@ -279,6 +274,7 @@
     modelCanvas.style.opacity  = '0';
     modelCanvas.style.transition = '';
     modelLoading.style.display = 'block';
+    modelSpinner.style.display = 'block';
     modelLabel.style.display   = 'block';
     modelInstr.style.display   = 'block';
     modelInstr.style.opacity   = '1';
@@ -304,14 +300,15 @@
       fitCameraToModel(model);
 
       modelLoading.style.display = 'none';
+      modelSpinner.style.display = 'none';
 
-      /* Fade model in */
+
       requestAnimationFrame(() => {
         modelCanvas.style.transition = 'opacity 0.7s ease';
         modelCanvas.style.opacity = '1';
       });
 
-      /* Instructions disappear after 4 s */
+
       clearTimeout(instrHideTimer);
       instrHideTimer = setTimeout(() => {
         modelInstr.style.transition = 'opacity 0.8s ease';
@@ -328,7 +325,7 @@
       onLoaded(modelCache[modelUrl]);
     } else {
       const dracoLoader = new THREE.DRACOLoader();
-      dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/gltf/');
+      dracoLoader.setDecoderPath('https:
       const loader = new THREE.GLTFLoader();
       loader.setDRACOLoader(dracoLoader);
       loader.load(modelUrl, (gltf) => {
@@ -336,6 +333,7 @@
         onLoaded(gltf);
       }, undefined, () => {
         modelLoading.textContent = 'Model unavailable';
+        modelSpinner.style.display = 'none';
       });
     }
   }
@@ -346,6 +344,7 @@
     modelCanvas.style.display  = 'none';
     modelCanvas.style.opacity  = '0';
     modelLoading.style.display = 'none';
+      modelSpinner.style.display = 'none';
     modelLabel.style.display   = 'none';
     modelInstr.style.display   = 'none';
     modelInstr.style.opacity   = '1';
@@ -357,9 +356,7 @@
     if (modelCanvas && modelCanvas.style.display === 'block') resizeThree();
   });
 
-  /* ══════════════════════════════════════
-     EXPAND OVERLAY
-  ══════════════════════════════════════ */
+
 
   function openExpand(card) {
     const key = card.dataset.project;
@@ -410,7 +407,7 @@
     }, 650);
   }
 
-  /* ── Countdown ── */
+
   function startCountdown() {
     let count = 5;
     expandCountdown.textContent = `Opening in ${count}`;
@@ -438,9 +435,7 @@
     }
   }
 
-  /* ══════════════════════════════════════
-     SLIDESHOW
-  ══════════════════════════════════════ */
+
 
   function isModelSlide(slide) {
     return slide && typeof slide === 'object' && slide.type === '3d';
@@ -485,7 +480,7 @@
       slideshowImg.style.opacity = '0';
       show3DSlide(slide.src);
     } else if (prevIs3D) {
-      /* Snap to new image — canvas hidden, bg is dark */
+
       slideshowImg.style.opacity = '0';
       slideshowImg.src = slide;
       updateCounter();
@@ -510,9 +505,7 @@
     slideshowCounter.textContent = `${slideIndex + 1} / ${slideList.length}`;
   }
 
-  /* ══════════════════════════════════════
-     EVENT WIRING
-  ══════════════════════════════════════ */
+
 
   window.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.project-card[data-project]').forEach(card => {
@@ -529,7 +522,7 @@
     slideshowPrev.addEventListener('click', () => showSlide(slideIndex - 1));
     slideshowNext.addEventListener('click', () => showSlide(slideIndex + 1));
 
-    /* Keyboard */
+
     document.addEventListener('keydown', (e) => {
       if (slideshowOverlay && slideshowOverlay.classList.contains('is-open')) {
         if (e.key === 'ArrowLeft')  showSlide(slideIndex - 1);
@@ -540,7 +533,7 @@
       }
     });
 
-    /* Touch swipe on slideshow (non-3D area) */
+
     let touchStartX = 0;
     slideshowOverlay.addEventListener('touchstart', (e) => {
       touchStartX = e.touches[0].clientX;

@@ -15,6 +15,11 @@
   <meta name="twitter:title" content="Arav Jivani — Architecture">
   <meta name="twitter:description" content="Designing spaces that impact people mentally and physically.">
   <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="images/meditation-hero.webp" type="image/webp">
+  <link rel="preload" as="image" href="images/monolith-hero.webp" type="image/webp">
+  <link rel="preload" as="image" href="images/garden-hero.webp" type="image/webp">
 </head>
 <body>
 
@@ -40,7 +45,7 @@
       <div class="portfolio-grid">
 
         <div class="project-card reveal" data-project="meditation">
-          <div class="card-bg" style="background-image:url('images/meditation-hero.png')"></div>
+          <div class="card-bg" style="background-image:url('images/meditation-hero.webp')"></div>
           <div class="card-gradient"></div>
           <div class="project-info">
             <p class="project-info-title">The House of Meditation</p>
@@ -49,7 +54,7 @@
         </div>
 
         <div class="project-card reveal reveal-delay-1" data-project="monolith">
-          <div class="card-bg" style="background-image:url('images/monolith-hero.png')"></div>
+          <div class="card-bg" style="background-image:url('images/monolith-hero.webp')"></div>
           <div class="card-gradient"></div>
           <div class="project-info">
             <p class="project-info-title">Get-away Monolith</p>
@@ -58,7 +63,7 @@
         </div>
 
         <div class="project-card reveal reveal-delay-2" data-project="garden">
-          <div class="card-bg" style="background-image:url('images/garden-hero.png')"></div>
+          <div class="card-bg" style="background-image:url('images/garden-hero.webp')"></div>
           <div class="card-gradient"></div>
           <div class="project-info">
             <p class="project-info-title">Garden Intellectual Space</p>
@@ -104,6 +109,7 @@
     <img class="slideshow-img" id="slideshow-img" src="" alt="" draggable="false" />
     <canvas id="model-canvas" class="model-canvas"></canvas>
     <div class="model-loading" id="model-loading">Loading model...</div>
+    <div class="model-spinner" id="model-spinner"></div>
     <div class="model-label" id="model-label">3D Model</div>
     <div class="model-instructions" id="model-instructions">Drag to rotate · Scroll to zoom · Right-click to pan</div>
     <button class="slideshow-arrow slideshow-arrow-next" id="slideshow-next" aria-label="Next slide">→</button>

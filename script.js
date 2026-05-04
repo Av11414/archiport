@@ -327,7 +327,10 @@
     if (modelCache[modelUrl]) {
       onLoaded(modelCache[modelUrl]);
     } else {
+      const dracoLoader = new THREE.DRACOLoader();
+      dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/gltf/');
       const loader = new THREE.GLTFLoader();
+      loader.setDRACOLoader(dracoLoader);
       loader.load(modelUrl, (gltf) => {
         modelCache[modelUrl] = gltf;
         onLoaded(gltf);

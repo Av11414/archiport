@@ -75,7 +75,7 @@
       title: 'The House of Meditation',
       location: 'Tokyo, Japan',
       hero: 'images/meditation-hero.png',
-      description: 'A contemplative retreat embedded within Tokyo\'s urban fabric. Raw concrete and filtered light define a space where silence becomes material — each threshold a transition from the city\'s noise into stillness. The architecture frames nature as event: the shadow of a branch, the movement of water, the slow arc of the sun.',
+      description: 'The House of Meditation is an experimental architecture project designed around a compact retreat defined by compression, vertical release, and controlled light. Movement slows the body before opening into a single meditation chamber. A circular roof aperture introduces a moving beam of sunlight, making time the primary spatial element.',
       slides: [
         'images/meditation-hero.png',
         'images/meditation-slide-02.jpg',
@@ -90,7 +90,7 @@
       title: 'Get-away Monolith',
       location: 'Remote hill top',
       hero: 'images/monolith-hero.png',
-      description: 'A single mass set against open sky. The Monolith is a retreat from complexity — its geometry absolute, its relationship to the landscape elemental. Stone and silence. The building asks nothing of its surroundings except to be seen, and to see.',
+      description: 'An experimental architecture/interior design project based on location and privacy. The house is set in a remote location to serve as a get-away for a weekend or vacation. Designed with a black obsidian color design, the house is a destimulator in a fast moving world, allowing the occupant to slow down in luxury while enjoying nature around them.',
       slides: [
         'images/monolith-hero.png',
         'images/monolith-slide-02.jpg',
@@ -104,7 +104,7 @@
       title: 'Garden Intellectual Space',
       location: 'Kampala, Uganda',
       hero: 'images/garden-hero.png',
-      description: 'Situated in Kampala, the Garden Intellectual Space is designed as a place of thought and quiet communion with the natural world. Marble and stone surfaces echo the terrain, while openings draw the garden inward — blurring the edge between built and living. The program invites contemplation, study, and a deepened awareness of one\'s environment.',
+      description: 'An architecture/interior design exploration project done to study materials and how it can affect interior environments. A personal test to discover if I can design for purpose. The purpose of this space is to support working conditions and productivity.',
       slides: [
         'images/garden-hero.png',
         'images/garden-slide-02.jpg',

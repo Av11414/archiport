@@ -109,6 +109,19 @@
         'images/garden-slide-04.webp'
       ],
       url: 'garden.html'
+    },
+    green: {
+      title: '"Green" House',
+      location: 'Eco-Friendly Residential Design',
+      hero: 'images/green-heroe.jpg',
+      description: 'This is a house designed to be eco friendly. From its materials to its systems, the house aims to be self sustaining and luxurious in the same soil.',
+      slides: [
+        'images/green-heroe.jpg',
+        'images/green-slide-01.png',
+        'images/green-slide-02.png',
+        'images/green-slide-03.jpg'
+      ],
+      url: 'green.html'
     }
   };
 

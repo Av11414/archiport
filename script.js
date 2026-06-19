@@ -130,6 +130,7 @@
   let countdownTimer = null;
   let slideIndex = 0;
   let slideList = [];
+  let slideTransTimer = null;
 
 
   let threeRenderer = null;
@@ -480,11 +481,17 @@
   }
 
   function showSlide(index) {
+    if (slideTransTimer) {
+      clearTimeout(slideTransTimer);
+      slideTransTimer = null;
+      slideshowImg.style.opacity = '1';
+    }
+
     const prevSlide = slideList[slideIndex];
     const prevIs3D  = isModelSlide(prevSlide);
 
     slideIndex = ((index % slideList.length) + slideList.length) % slideList.length;
-    const slide   = slideList[slideIndex];
+    const slide    = slideList[slideIndex];
     const currIs3D = isModelSlide(slide);
 
     if (prevIs3D) hide3DSlide();
@@ -493,7 +500,6 @@
       slideshowImg.style.opacity = '0';
       show3DSlide(slide.src);
     } else if (prevIs3D) {
-
       slideshowImg.style.opacity = '0';
       slideshowImg.src = slide;
       updateCounter();
@@ -504,8 +510,10 @@
       });
     } else {
       slideshowImg.style.opacity = '0';
-      setTimeout(() => {
-        slideshowImg.src = slide;
+      const targetSlide = slide;
+      slideTransTimer = setTimeout(() => {
+        slideTransTimer = null;
+        slideshowImg.src = targetSlide;
         updateCounter();
         slideshowImg.style.opacity = '1';
       }, 200);

@@ -1,558 +1,184 @@
+/* ───────────────────────────────────────────────────────────
+   arav-jivani.com
+   Scroll reveal + opt-in 3D model viewer.
+   ─────────────────────────────────────────────────────────── */
+
+/* ── reveal on scroll ──────────────────────────────────────── */
 (function () {
-  window.addEventListener('DOMContentLoaded', () => {
-    const video = document.querySelector('.hero-video');
-    if (!video) return;
-
-    let rafId;
-
-    function onScroll() {
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        video.style.transform = `translateY(${window.scrollY * 0.28}px)`;
-        rafId = null;
-      });
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-  });
-})();
-
-(function () {
-  window.addEventListener('DOMContentLoaded', () => {
-    const els = document.querySelectorAll('.reveal');
+  window.addEventListener('DOMContentLoaded', function () {
+    var els = document.querySelectorAll('.reveal');
     if (!els.length) return;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, {
-      threshold: 0.12,
-      rootMargin: '0px 0px -40px 0px'
-    });
+    if (!('IntersectionObserver' in window) ||
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      els.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
 
-    els.forEach(el => observer.observe(el));
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px' });
+
+    els.forEach(function (el) { io.observe(el); });
   });
 })();
 
+/* ── 3D model viewer ───────────────────────────────────────────
+   Loaded only when the visitor asks for it. Three.js and the GLB
+   are fetched on click; the renderer is disposed when the section
+   scrolls out of view so the WebGL context is not left running.
+   ───────────────────────────────────────────────────────────── */
 (function () {
-  document.addEventListener('contextmenu', (e) => {
-    if (e.target.tagName === 'IMG') e.preventDefault();
-  });
+  var THREE_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  var BASE      = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/';
+  var DRACO     = BASE + 'libs/draco/gltf/';
+  var DEPS      = ['controls/OrbitControls.js', 'loaders/DRACOLoader.js', 'loaders/GLTFLoader.js'];
 
-  document.addEventListener('dragstart', (e) => {
-    if (e.target.tagName === 'IMG') e.preventDefault();
-  });
-
-  let pressTimer;
-  document.addEventListener('touchstart', (e) => {
-    if (e.target.tagName === 'IMG') {
-      pressTimer = setTimeout(() => {}, 600);
-    }
-  }, { passive: true });
-
-  document.addEventListener('touchend', () => {
-    clearTimeout(pressTimer);
-  });
-
-  document.addEventListener('touchstart', (e) => {
-    if (e.target.tagName === 'IMG') {
-      e.preventDefault();
-    }
-  }, { passive: false });
-})();
-
-(function () {
-  const PROJECTS = {
-    meditation: {
-      title: 'The House of Meditation',
-      location: 'Tokyo, Japan',
-      hero: 'images/meditation-hero.webp',
-      description: 'The House of Meditation is an experimental architecture project designed around a compact retreat defined by compression, vertical release, and controlled light. Movement slows the body before opening into a single meditation chamber. A circular roof aperture introduces a moving beam of sunlight, making time the primary spatial element.',
-      slides: [
-        'images/meditation-hero.webp',
-        'images/meditation-slide-02.webp',
-        'images/meditation-slide-03.webp',
-        'images/meditation-slide-04.webp',
-        { type: '3d', src: 'images/meditation-model.glb' },
-        'images/meditation-slide-05.webp'
-      ],
-      url: 'meditation.html'
-    },
-    monolith: {
-      title: 'Get-away Monolith',
-      location: 'Remote hill top',
-      hero: 'images/monolith-hero.webp',
-      description: 'An experimental architecture/interior design project based on location and privacy. The house is set in a remote location to serve as a get-away for a weekend or vacation. Designed with a black obsidian color design, the house is a destimulator in a fast moving world, allowing the occupant to slow down in luxury while enjoying nature around them.',
-      slides: [
-        'images/monolith-hero.webp',
-        'images/monolith-slide-02.webp',
-        'images/monolith-slide-03.webp',
-        { type: '3d', src: 'images/monolith-model.glb' },
-        'images/monolith-slide-04.webp'
-      ],
-      url: 'monolith.html'
-    },
-    garden: {
-      title: 'Garden Intellectual Space',
-      location: 'Kampala, Uganda',
-      hero: 'images/garden-hero.webp',
-      description: 'An architecture/interior design exploration project done to study materials and how it can affect interior environments. A personal test to discover if I can design for purpose. The purpose of this space is to support working conditions and productivity.',
-      slides: [
-        'images/garden-hero.webp',
-        'images/garden-slide-02.webp',
-        'images/garden-slide-03.webp',
-        { type: '3d', src: 'images/garden-model.glb' },
-        'images/garden-slide-04.webp'
-      ],
-      url: 'garden.html'
-    }
-  };
-
-
-  let currentProject = null;
-  let countdownTimer = null;
-  let slideIndex = 0;
-  let slideList = [];
-  let slideTransTimer = null;
-
-
-  let threeRenderer = null;
-  let threeScene = null;
-  let threeCamera = null;
-  let threeControls = null;
-  let threeAnimId = null;
-  let modelCache = {};
-  let currentModelObject = null;
-  let instrHideTimer = null;
-
-
-  const expandOverlay   = document.getElementById('expand-overlay');
-  const expandBg        = document.getElementById('expand-bg');
-  const expandClose     = document.getElementById('expand-close');
-  const expandContent   = document.getElementById('expand-content');
-  const expandTitle     = document.getElementById('expand-title');
-  const expandLocation  = document.getElementById('expand-location');
-  const expandDesc      = document.getElementById('expand-description');
-  const expandCountdown = document.getElementById('expand-countdown');
-  const expandViewBtn   = document.getElementById('expand-view-btn');
-
-  const slideshowOverlay = document.getElementById('slideshow-overlay');
-  const slideshowClose   = document.getElementById('slideshow-close');
-  const slideshowPrev    = document.getElementById('slideshow-prev');
-  const slideshowNext    = document.getElementById('slideshow-next');
-  const slideshowImg     = document.getElementById('slideshow-img');
-  const slideshowCounter = document.getElementById('slideshow-counter');
-
-  const modelCanvas  = document.getElementById('model-canvas');
-  const modelLoading = document.getElementById('model-loading');
-  const modelLabel   = document.getElementById('model-label');
-  const modelInstr   = document.getElementById('model-instructions');
-  const modelSpinner = document.getElementById('model-spinner');
-
-  if (!expandOverlay) return;
-
-
-
-  function initThree() {
-    if (threeRenderer) return;
-
-    threeRenderer = new THREE.WebGLRenderer({ canvas: modelCanvas, antialias: true, alpha: false });
-    threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    threeRenderer.setClearColor(0x0d0d0d, 1);
-    threeRenderer.outputEncoding = THREE.sRGBEncoding;
-    threeRenderer.physicallyCorrectLights = true;
-
-    threeScene = new THREE.Scene();
-
-    threeCamera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.01, 2000);
-
-
-    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
-    threeScene.add(ambient);
-
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
-    keyLight.position.set(6, 12, 8);
-    threeScene.add(keyLight);
-
-    const fillLight = new THREE.DirectionalLight(0xd0e0ff, 0.45);
-    fillLight.position.set(-10, 4, -6);
-    threeScene.add(fillLight);
-
-    const rimLight = new THREE.DirectionalLight(0xffeedd, 0.25);
-    rimLight.position.set(2, -4, -8);
-    threeScene.add(rimLight);
-
-    threeControls = new THREE.OrbitControls(threeCamera, modelCanvas);
-    threeControls.enableDamping = true;
-    threeControls.dampingFactor = 0.055;
-    threeControls.screenSpacePanning = true;
-    threeControls.minDistance = 0.5;
-    threeControls.maxDistance = 500;
-    threeControls.touches = {
-      ONE: THREE.TOUCH.ROTATE,
-      TWO: THREE.TOUCH.DOLLY_PAN
-    };
+  function script(src) {
+    return new Promise(function (res, rej) {
+      var s = document.createElement('script');
+      s.src = src; s.onload = res; s.onerror = function () { rej(new Error(src)); };
+      document.head.appendChild(s);
+    });
   }
 
-  function resizeThree() {
-    if (!threeRenderer) return;
-    const w = window.innerWidth;
-    const h = window.innerHeight;
-    threeRenderer.setSize(w, h);
-    threeCamera.aspect = w / h;
-    threeCamera.updateProjectionMatrix();
-  }
-
-  function startRenderLoop() {
-    if (threeAnimId) return;
-    (function loop() {
-      threeAnimId = requestAnimationFrame(loop);
-      threeControls.update();
-      threeRenderer.render(threeScene, threeCamera);
-    })();
-  }
-
-  function stopRenderLoop() {
-    if (threeAnimId) {
-      cancelAnimationFrame(threeAnimId);
-      threeAnimId = null;
+  var booted = null;
+  function boot() {
+    if (!booted) {
+      booted = script(THREE_SRC).then(function () {
+        return DEPS.reduce(function (p, d) {
+          return p.then(function () { return script(BASE + d); });
+        }, Promise.resolve());
+      });
     }
+    return booted;
   }
 
-  function applyArchitecturalMaterial(object) {
-    object.traverse(child => {
-      if (!child.isMesh) return;
-      const mats = Array.isArray(child.material) ? child.material : [child.material];
-      mats.forEach(mat => {
-        if (!mat) return;
-        if (!mat.map) {
-          mat.color.set(0x888888);
-          mat.roughness = 0.65;
-          mat.metalness = 0.05;
+  window.addEventListener('DOMContentLoaded', function () {
+    var host = document.querySelector('.model[data-model]');
+    if (!host) return;
+
+    var btn    = host.querySelector('.model-btn');
+    var note   = host.querySelector('.model-note');
+    var canvas = host.querySelector('canvas');
+    var state  = null;
+
+    function teardown() {
+      if (!state) return;
+      cancelAnimationFrame(state.raf);
+      state.controls.dispose();
+      state.scene.traverse(function (o) {
+        if (o.isMesh) {
+          o.geometry.dispose();
+          (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) { m && m.dispose(); });
         }
-        mat.needsUpdate = true;
       });
-    });
-  }
-
-  function fitCameraToModel(object) {
-    const box = new THREE.Box3().setFromObject(object);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-
-    const fov = threeCamera.fov * (Math.PI / 180);
-    const dist = (maxDim * 0.5) / Math.tan(fov * 0.5) * 2.0;
-
-    threeCamera.position.set(
-      center.x + dist * 0.55,
-      center.y + dist * 0.42,
-      center.z + dist * 0.72
-    );
-    threeCamera.near = maxDim / 200;
-    threeCamera.far  = maxDim * 100;
-    threeCamera.updateProjectionMatrix();
-
-    threeControls.target.copy(center);
-    threeControls.minDistance = maxDim * 0.3;
-    threeControls.maxDistance = maxDim * 12;
-    threeControls.update();
-  }
-
-  function clearModelFromScene() {
-    if (currentModelObject) {
-      threeScene.remove(currentModelObject);
-      currentModelObject = null;
-    }
-  }
-
-  function show3DSlide(modelUrl) {
-    modelCanvas.style.display  = 'block';
-    modelCanvas.style.opacity  = '0';
-    modelCanvas.style.transition = '';
-    modelLoading.style.display = 'block';
-    modelSpinner.style.display = 'block';
-    modelLabel.style.display   = 'block';
-    modelInstr.style.display   = 'block';
-    modelInstr.style.opacity   = '1';
-    modelInstr.style.transition = '';
-
-    initThree();
-    resizeThree();
-    clearModelFromScene();
-    startRenderLoop();
-
-    function onLoaded(gltf) {
-      clearModelFromScene();
-
-      const model = gltf.scene;
-      model.position.set(0, 0, 0);
-      model.rotation.set(0, 0, 0);
-      model.scale.set(1, 1, 1);
-
-      applyArchitecturalMaterial(model);
-      threeScene.add(model);
-      currentModelObject = model;
-
-      fitCameraToModel(model);
-
-      modelLoading.style.display = 'none';
-      modelSpinner.style.display = 'none';
-
-
-      requestAnimationFrame(() => {
-        modelCanvas.style.transition = 'opacity 0.7s ease';
-        modelCanvas.style.opacity = '1';
-      });
-
-
-      clearTimeout(instrHideTimer);
-      instrHideTimer = setTimeout(() => {
-        modelInstr.style.transition = 'opacity 0.8s ease';
-        modelInstr.style.opacity = '0';
-        setTimeout(() => {
-          modelInstr.style.display = 'none';
-          modelInstr.style.opacity = '1';
-          modelInstr.style.transition = '';
-        }, 820);
-      }, 4000);
+      state.renderer.dispose();
+      state = null;
+      canvas.style.display = 'none';
+      note.style.display = 'none';
+      btn.style.display = '';
+      btn.textContent = 'View 3D model';
     }
 
-    if (modelCache[modelUrl]) {
-      onLoaded(modelCache[modelUrl]);
-    } else {
-      const dracoLoader = new THREE.DRACOLoader();
-      dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/gltf/');
-      const loader = new THREE.GLTFLoader();
-      loader.setDRACOLoader(dracoLoader);
-      loader.load(modelUrl, (gltf) => {
-        modelCache[modelUrl] = gltf;
-        onLoaded(gltf);
-      }, undefined, () => {
-        modelLoading.textContent = 'Model unavailable';
-        modelSpinner.style.display = 'none';
+    function fitCamera(cam, controls, obj) {
+      var box    = new THREE.Box3().setFromObject(obj);
+      var centre = box.getCenter(new THREE.Vector3());
+      var size   = box.getSize(new THREE.Vector3());
+      var maxDim = Math.max(size.x, size.y, size.z) || 1;
+      var dist   = (maxDim * 0.5) / Math.tan((cam.fov * Math.PI / 180) * 0.5) * 2.0;
+
+      cam.position.set(centre.x + dist * 0.55, centre.y + dist * 0.42, centre.z + dist * 0.72);
+      cam.near = maxDim / 200;
+      cam.far  = maxDim * 100;
+      cam.updateProjectionMatrix();
+
+      controls.target.copy(centre);
+      controls.minDistance = maxDim * 0.3;
+      controls.maxDistance = maxDim * 12;
+      controls.update();
+    }
+
+    function start() {
+      var w = host.clientWidth, h = host.clientHeight;
+
+      var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(w, h, false);
+      renderer.setClearColor(0x151514, 1);
+      renderer.outputEncoding = THREE.sRGBEncoding;
+
+      var scene  = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(40, w / h, 0.01, 2000);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      var key = new THREE.DirectionalLight(0xffffff, 1.05); key.position.set(6, 12, 8);   scene.add(key);
+      var fil = new THREE.DirectionalLight(0xd0e0ff, 0.42); fil.position.set(-10, 4, -6); scene.add(fil);
+      var rim = new THREE.DirectionalLight(0xffeedd, 0.26); rim.position.set(2, -4, -8);  scene.add(rim);
+
+      var controls = new THREE.OrbitControls(camera, canvas);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.055;
+      controls.screenSpacePanning = true;
+
+      state = { renderer: renderer, scene: scene, camera: camera, controls: controls, raf: 0 };
+
+      var draco = new THREE.DRACOLoader();
+      draco.setDecoderPath(DRACO);
+      var loader = new THREE.GLTFLoader();
+      loader.setDRACOLoader(draco);
+
+      loader.load(host.dataset.model, function (gltf) {
+        var model = gltf.scene;
+        model.traverse(function (c) {
+          if (!c.isMesh) return;
+          (Array.isArray(c.material) ? c.material : [c.material]).forEach(function (m) {
+            if (m && !m.map && m.color) { m.color.set(0x8d8d8a); m.roughness = 0.68; m.metalness = 0.04; m.needsUpdate = true; }
+          });
+        });
+        scene.add(model);
+        fitCamera(camera, controls, model);
+
+        btn.style.display = 'none';
+        canvas.style.display = 'block';
+        note.style.display = 'block';
+
+        (function loop() {
+          if (!state) return;
+          state.raf = requestAnimationFrame(loop);
+          controls.update();
+          renderer.render(scene, camera);
+        })();
+      }, null, function () {
+        btn.disabled = true;
+        btn.textContent = 'Model unavailable';
+        state = null;
       });
     }
-  }
 
-  function hide3DSlide() {
-    stopRenderLoop();
-    clearTimeout(instrHideTimer);
-    modelCanvas.style.display  = 'none';
-    modelCanvas.style.opacity  = '0';
-    modelLoading.style.display = 'none';
-      modelSpinner.style.display = 'none';
-    modelLabel.style.display   = 'none';
-    modelInstr.style.display   = 'none';
-    modelInstr.style.opacity   = '1';
-    modelInstr.style.transition = '';
-    modelLoading.textContent = 'Loading model...';
-  }
-
-  window.addEventListener('resize', () => {
-    if (modelCanvas && modelCanvas.style.display === 'block') resizeThree();
-  });
-
-
-
-  function openExpand(card) {
-    const key = card.dataset.project;
-    const proj = PROJECTS[key];
-    if (!proj) return;
-    currentProject = proj;
-
-    const rect = card.getBoundingClientRect();
-
-    expandBg.style.backgroundImage = `url('${proj.hero}')`;
-    expandTitle.textContent    = proj.title;
-    expandLocation.textContent = proj.location;
-    expandDesc.textContent     = proj.description;
-    expandCountdown.textContent = '';
-    expandCountdown.style.opacity = '1';
-    expandViewBtn.classList.remove('visible');
-    expandContent.classList.remove('visible');
-
-    expandOverlay.style.display = 'block';
-    expandOverlay.style.top     = rect.top + 'px';
-    expandOverlay.style.left    = rect.left + 'px';
-    expandOverlay.style.width   = rect.width + 'px';
-    expandOverlay.style.height  = rect.height + 'px';
-    expandOverlay.setAttribute('aria-hidden', 'false');
-
-    void expandOverlay.offsetHeight;
-
-    expandOverlay.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-
-    clearCountdown();
-    setTimeout(() => {
-      expandContent.classList.add('visible');
-      startCountdown();
-    }, 650);
-  }
-
-  function closeExpand() {
-    clearCountdown();
-    expandContent.classList.remove('visible');
-    expandOverlay.classList.remove('is-open');
-    expandOverlay.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-
-    setTimeout(() => {
-      expandOverlay.style.display = 'none';
-      currentProject = null;
-    }, 650);
-  }
-
-
-  function startCountdown() {
-    let count = 5;
-    expandCountdown.textContent = `Opening in ${count}`;
-
-    countdownTimer = setInterval(() => {
-      count--;
-      if (count > 0) {
-        expandCountdown.textContent = `Opening in ${count}`;
-      } else {
-        clearInterval(countdownTimer);
-        countdownTimer = null;
-        expandCountdown.style.opacity = '0';
-        setTimeout(() => {
-          expandCountdown.textContent = '';
-          expandViewBtn.classList.add('visible');
-        }, 400);
-      }
-    }, 1000);
-  }
-
-  function clearCountdown() {
-    if (countdownTimer) {
-      clearInterval(countdownTimer);
-      countdownTimer = null;
-    }
-  }
-
-
-
-  function isModelSlide(slide) {
-    return slide && typeof slide === 'object' && slide.type === '3d';
-  }
-
-  function openSlideshow(proj) {
-    slideList  = proj.slides;
-    slideIndex = 0;
-
-    const first = slideList[0];
-    if (isModelSlide(first)) {
-      slideshowImg.style.opacity = '0';
-      show3DSlide(first.src);
-    } else {
-      slideshowImg.style.opacity = '1';
-      slideshowImg.src = first;
-      slideshowImg.alt = proj.title;
-    }
-
-    updateCounter();
-    slideshowOverlay.classList.add('is-open');
-    slideshowOverlay.setAttribute('aria-hidden', 'false');
-  }
-
-  function closeSlideshow() {
-    if (isModelSlide(slideList[slideIndex])) hide3DSlide();
-    slideshowOverlay.classList.remove('is-open');
-    slideshowOverlay.setAttribute('aria-hidden', 'true');
-  }
-
-  function showSlide(index) {
-    if (slideTransTimer) {
-      clearTimeout(slideTransTimer);
-      slideTransTimer = null;
-      slideshowImg.style.opacity = '1';
-    }
-
-    const prevSlide = slideList[slideIndex];
-    const prevIs3D  = isModelSlide(prevSlide);
-
-    slideIndex = ((index % slideList.length) + slideList.length) % slideList.length;
-    const slide    = slideList[slideIndex];
-    const currIs3D = isModelSlide(slide);
-
-    if (prevIs3D) hide3DSlide();
-
-    if (currIs3D) {
-      slideshowImg.style.opacity = '0';
-      show3DSlide(slide.src);
-    } else if (prevIs3D) {
-      slideshowImg.style.opacity = '0';
-      slideshowImg.src = slide;
-      updateCounter();
-      requestAnimationFrame(() => {
-        slideshowImg.style.transition = 'opacity 0.2s ease';
-        slideshowImg.style.opacity = '1';
-        setTimeout(() => { slideshowImg.style.transition = ''; }, 220);
+    btn.addEventListener('click', function () {
+      if (state) return;
+      btn.textContent = 'Loading…';
+      boot().then(start).catch(function () {
+        btn.disabled = true;
+        btn.textContent = 'Model unavailable';
       });
-    } else {
-      slideshowImg.style.opacity = '0';
-      const targetSlide = slide;
-      slideTransTimer = setTimeout(() => {
-        slideTransTimer = null;
-        slideshowImg.src = targetSlide;
-        updateCounter();
-        slideshowImg.style.opacity = '1';
-      }, 200);
+    });
+
+    window.addEventListener('resize', function () {
+      if (!state) return;
+      var w = host.clientWidth, h = host.clientHeight;
+      state.renderer.setSize(w, h, false);
+      state.camera.aspect = w / h;
+      state.camera.updateProjectionMatrix();
+    });
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (!e.isIntersecting) teardown(); });
+      }, { threshold: 0 }).observe(host);
     }
-
-    if (!currIs3D) updateCounter();
-  }
-
-  function updateCounter() {
-    slideshowCounter.textContent = `${slideIndex + 1} / ${slideList.length}`;
-  }
-
-
-
-  window.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.project-card[data-project]').forEach(card => {
-      card.addEventListener('click', () => openExpand(card));
-    });
-
-    expandClose.addEventListener('click', closeExpand);
-
-    expandViewBtn.addEventListener('click', () => {
-      if (currentProject) openSlideshow(currentProject);
-    });
-
-    slideshowClose.addEventListener('click', closeSlideshow);
-    slideshowPrev.addEventListener('click', () => showSlide(slideIndex - 1));
-    slideshowNext.addEventListener('click', () => showSlide(slideIndex + 1));
-
-
-    document.addEventListener('keydown', (e) => {
-      if (slideshowOverlay && slideshowOverlay.classList.contains('is-open')) {
-        if (e.key === 'ArrowLeft')  showSlide(slideIndex - 1);
-        if (e.key === 'ArrowRight') showSlide(slideIndex + 1);
-        if (e.key === 'Escape')     closeSlideshow();
-      } else if (expandOverlay && expandOverlay.classList.contains('is-open')) {
-        if (e.key === 'Escape') closeExpand();
-      }
-    });
-
-
-    let touchStartX = 0;
-    slideshowOverlay.addEventListener('touchstart', (e) => {
-      touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-
-    slideshowOverlay.addEventListener('touchend', (e) => {
-      if (isModelSlide(slideList[slideIndex])) return;
-      const delta = touchStartX - e.changedTouches[0].clientX;
-      if (Math.abs(delta) > 50) {
-        delta > 0 ? showSlide(slideIndex + 1) : showSlide(slideIndex - 1);
-      }
-    }, { passive: true });
   });
 })();

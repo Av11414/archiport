@@ -3,6 +3,38 @@
    Scroll reveal + opt-in 3D model viewer.
    ─────────────────────────────────────────────────────────── */
 
+/* ── home: hovering a work title fills the page with its image ── */
+(function () {
+  window.addEventListener('DOMContentLoaded', function () {
+    var stage = document.querySelector('.stage');
+    if (!stage) return;
+
+    var shots = stage.querySelectorAll('img[data-stage]');
+    var links = document.querySelectorAll('.nav-link[data-stage]');
+    if (!shots.length || !links.length) return;
+
+    // Pointer-coarse devices get the inline thumbnails instead.
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+    function show(i) {
+      shots.forEach(function (im) {
+        im.classList.toggle('on', String(i) === im.dataset.stage);
+      });
+      links.forEach(function (a) {
+        a.classList.toggle('on', String(i) === a.dataset.stage);
+      });
+      if (i !== null) document.body.classList.add('touched');
+    }
+
+    links.forEach(function (a) {
+      a.addEventListener('mouseenter', function () { show(a.dataset.stage); });
+      a.addEventListener('focus', function () { show(a.dataset.stage); });
+      a.addEventListener('mouseleave', function () { show(null); });
+      a.addEventListener('blur', function () { show(null); });
+    });
+  });
+})();
+
 /* ── reveal on scroll ──────────────────────────────────────── */
 (function () {
   window.addEventListener('DOMContentLoaded', function () {

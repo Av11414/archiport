@@ -200,6 +200,8 @@ figcaption { margin-top: 13px; font-size: 0.62rem; letter-spacing: 0.18em; text-
 .plate img { width: 100%; height: auto; }
 
 .renders { display: grid; grid-template-columns: 1fr; gap: clamp(18px, 2.6vw, 34px); }
+/* dense analysis sheets open full size */
+.renders figure > a { display: block; cursor: zoom-in; }
 
 /* ── 3d viewer ─────────────────────────────────────────────── */
 
